@@ -1,26 +1,41 @@
 import { Html } from '@react-three/drei';
-import { FC, ReactNode } from 'react';
-import { Euler } from 'three';
+import { useFrame } from '@react-three/fiber';
+import { FC, ReactNode, useRef } from 'react';
+import { Mesh, Vector3 } from 'three';
 
 export type ImagePlaneProps = {
     yaw: number;
     pitch: number;
     roll: number;
     distance: number;
+
 }
+
 
 export const ImagePlane: FC<ImagePlaneProps & { children: ReactNode }> = ({ yaw, pitch, roll, distance, children }) => {
     // Set the position of the plane at the specified distance from the origin
 
-    const x = distance * Math.cos(pitch) * Math.sin(yaw);
-    const y = -distance * Math.sin(pitch);
-    const z = -distance * Math.cos(pitch) * Math.cos(yaw);
+    const meshRef = useRef<Mesh>();
 
+    useFrame(() => {
 
-    const rotation = new Euler(-pitch, -yaw, roll);
+        if (!meshRef.current) return;
+        // Set the initial position based on the yaw and pitch
+        meshRef.current.position.set(
+            distance * Math.cos(yaw) * Math.cos(pitch),
+            distance * Math.sin(pitch),
+            distance * Math.sin(yaw) * Math.cos(pitch)
+        );
+
+        // Apply roll (rotation around Z-axis)
+        meshRef.current.rotation.set(pitch, yaw, roll);
+
+        // Make the object look at the center
+        meshRef.current.lookAt(new Vector3(0, 0, 0));
+    });
 
     return (
-        <mesh position={[x, y, z]} rotation={rotation}>
+        <mesh ref={meshRef} >
             <planeGeometry args={[1, 1]} /> {/* Adjust size of the plane here */}
             <meshBasicMaterial color="lightblue" />
             <Html transform>

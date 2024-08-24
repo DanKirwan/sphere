@@ -4,6 +4,7 @@ import Webcam from 'react-webcam';
 import { ImagePlane, ImagePlaneProps } from './ImagePlane';
 import { clamp } from 'lodash';
 
+import { CameraIcon } from '@heroicons/react/24/solid'
 
 const SPEED = 0.001;
 
@@ -77,15 +78,24 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch'> & Props> = (
 
     return (
         <ImagePlane {...rest} yaw={yaw} pitch={pitch}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className='relative'>
 
                 <Webcam
                     ref={webcamRef}
                     screenshotFormat="image/jpeg"
                 />
-                <button onClick={() => onScreenshot(capture() ?? '', yaw, pitch)}>
-                    Capture
-                </button>
+
+                <div className='absolute top-1 right-1'>
+
+
+                    <button
+                        onClick={() => onScreenshot(capture() ?? '', yaw, pitch)}
+                        className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                        <CameraIcon className='size-6' />
+                    </button>
+
+                </div>
             </div>
         </ImagePlane>
     );
