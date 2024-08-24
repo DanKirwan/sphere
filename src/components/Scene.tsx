@@ -1,10 +1,10 @@
 import { Box, DeviceOrientationControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { ImagePlane } from './ImagePlane'
 import { WebcamPlane } from './WebCamPlane'
 
-import { ArrowUturnLeftIcon, MinusIcon, PlusIcon, CubeTransparentIcon, ArrowsPointingInIcon } from '@heroicons/react/24/solid'
+import { ArrowUturnLeftIcon, MinusIcon, PlusIcon, CubeTransparentIcon, ArrowsPointingInIcon, ArrowPathRoundedSquareIcon } from '@heroicons/react/24/solid'
 import { CamControls } from './CamControls'
 
 
@@ -35,17 +35,36 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
     const [distance, setDistance] = useState(10);
     const [screenshots, setScreenshots] = useState<Shot[]>([]);
 
+    const [hide, setHide] = useState(false);
+
     const [augmented, setAugmented] = useState(augmentedPossible);
+
+
+
+    const [mediaDevices, setMediaDevices] = useState<MediaDeviceInfo[]>([]);
+
+    useEffect(() => {
+        navigator.mediaDevices.enumerateDevices().then(d => setMediaDevices(d.filter(d => d.kind == 'videoinput')));
+
+    }, [])
+
+    const [selectedDeviceIndex, setSelectedDeviceIndex] = useState(0);
 
 
     const maskPercentage = 5;
 
+    const selectedDevice = mediaDevices.length == 0 ? null : mediaDevices[selectedDeviceIndex];
 
+
+    console.log(mediaDevices)
+
+    const cycleDevice = () => {
+        setSelectedDeviceIndex(x => (x + 1) % mediaDevices.length);
+    }
 
     const mask = `${getGradient('left', maskPercentage)},${getGradient('top', maskPercentage)}`
-    console.log(mask);
     return (
-        <div className='w-screen h-screen relative'>
+        <div className='w-[calc(100dvw)] h-[calc(100dvh)] relative'>
 
             <div className='absolute w-full h-full'>
 
@@ -72,11 +91,14 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
 
                     <Box position={[0, 0, 0]} />
 
-                    <WebcamPlane
-                        roll={0} distance={distance}
-                        onScreenshot={(src, yaw, pitch) => setScreenshots(shots => [{ src, yaw, pitch }, ...shots])}
-                    />
+                    {!hide &&
+                        <WebcamPlane
+                            deviceId={selectedDevice?.deviceId}
+                            roll={0} distance={distance}
+                            onScreenshot={(src, yaw, pitch) => setScreenshots(shots => [{ src, yaw, pitch }, ...shots])}
+                        />
 
+                    }
 
                 </Canvas>
 
@@ -115,6 +137,24 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
                     >
                         {augmented ? <ArrowsPointingInIcon className='size-6' /> : <CubeTransparentIcon className='size-6' />}
                     </button>
+
+                    {mediaDevices.length > 1 &&
+                        <button
+                            className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+                            onClick={() => cycleDevice()}
+                        >
+                            <ArrowPathRoundedSquareIcon className='size-6' />
+                        </button>
+                    }
+
+                    <button
+                        className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => setHide(h => !h)}
+                    >
+                        Hide
+                    </button>
+
+
                 </div>
             </div>
 

@@ -1,22 +1,25 @@
 import { useFrame } from '@react-three/fiber';
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import { ImagePlane, ImagePlaneProps } from './ImagePlane';
-import { clamp } from 'lodash';
 
-import { CameraIcon } from '@heroicons/react/24/solid'
+import { CameraIcon } from '@heroicons/react/24/solid';
+import { Vector3 } from 'three';
 
 const SPEED = 0.01;
 
 type Props = {
     onScreenshot: (src: string, yaw: number, pitch: number) => void;
+    deviceId?: string;
 }
 
-export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch'> & Props> = ({ onScreenshot, ...rest }) => {
+
+const cameraDir = new Vector3();
+
+
+export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch'> & Props> = ({ onScreenshot, deviceId, ...rest }) => {
     // Set the position of the plane at the specified distance from the origin
 
-    const [yawDelta, setYawDelta] = useState(0);
-    const [pitchDelta, setPitchDelta] = useState(0);
     const webcamRef = useRef<Webcam | null>(null);
 
     const capture = useCallback(
@@ -28,58 +31,32 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch'> & Props> = (
         [webcamRef]
     );
 
-
-    useEffect(() => {
-        const handleKeyChange = (isDown: boolean) => (event: KeyboardEvent,) => {
-            const key = event.key.toLocaleLowerCase();
-
-            const delta = isDown ? 1 : -1;
-
-            switch (key) {
-                case 'w':
-                    return setPitchDelta(d => clamp(d + delta, -1, 1));
-                case 's':
-                    return setPitchDelta(d => clamp(d - delta, -1, 1));
-
-                case 'd':
-                    return setYawDelta(d => clamp(d + delta, -1, 1));
-                case 'a':
-                    return setYawDelta(d => clamp(d - delta, -1, 1));
-
-            }
-        }
-
-        const handleKeyDown = handleKeyChange(true);
-        const handleKeyUp = handleKeyChange(false);
-
-
-
-
-
-        window.addEventListener('keydown', ev => handleKeyDown(ev));
-        window.addEventListener('keyup', ev => handleKeyUp(ev));
-
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        }
-    }, [])
-
     const [yaw, setYaw] = useState(0);
     const [pitch, setPitch] = useState(0);
 
-    useFrame(() => {
-        setYaw(y => y + yawDelta * SPEED)
-        setPitch(p => p + pitchDelta * SPEED)
+    useFrame((state) => {
+
+        state.camera.getWorldDirection(cameraDir);
+        const distance = cameraDir.length();
+
+        const pitch = Math.asin(cameraDir.y / distance);
+        const yaw = Math.atan2(cameraDir.z, cameraDir.x)
+
+        setYaw(yaw);
+        setPitch(pitch);
+
 
     });
 
     return (
-        <ImagePlane {...rest} yaw={yaw} pitch={pitch}>
-            <div className='relative'>
+        <ImagePlane {...rest} yaw={yaw} pitch={pitch} forceFront>
+            <div className='relative z-10'>
 
                 <Webcam
+                    videoConstraints={{
+                        facingMode: 'environment'
+                    }}
+                    id={deviceId}
                     ref={webcamRef}
                     screenshotFormat="image/jpeg"
                 />

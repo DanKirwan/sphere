@@ -8,11 +8,12 @@ export type ImagePlaneProps = {
     pitch: number;
     roll: number;
     distance: number;
+    forceFront?: boolean;
 
 }
 
 
-export const ImagePlane: FC<ImagePlaneProps & { children: ReactNode }> = ({ yaw, pitch, roll, distance, children }) => {
+export const ImagePlane: FC<ImagePlaneProps & { children: ReactNode }> = ({ yaw, pitch, roll, distance, children, forceFront = false }) => {
     // Set the position of the plane at the specified distance from the origin
 
     const meshRef = useRef<Mesh>();
@@ -28,7 +29,6 @@ export const ImagePlane: FC<ImagePlaneProps & { children: ReactNode }> = ({ yaw,
         );
 
         // Apply roll (rotation around Z-axis)
-        meshRef.current.rotation.set(pitch, yaw, roll);
 
         // Make the object look at the center
         meshRef.current.lookAt(new Vector3(0, 0, 0));
@@ -38,7 +38,8 @@ export const ImagePlane: FC<ImagePlaneProps & { children: ReactNode }> = ({ yaw,
         <mesh ref={meshRef} >
             <planeGeometry args={[1, 1]} /> {/* Adjust size of the plane here */}
             <meshBasicMaterial color="lightblue" />
-            <Html transform>
+            <Html transform zIndexRange={forceFront ? [1, 1] : [0, 0]}>
+
                 {children}
             </Html>
         </mesh>

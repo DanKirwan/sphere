@@ -20,7 +20,7 @@ function App() {
       /> :
 
       <Scene
-        augmented={permissionGranted && augmentedPossible}
+        augmentedPossible={permissionGranted && augmentedPossible}
       />
 
   )
