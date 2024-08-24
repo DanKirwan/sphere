@@ -1,10 +1,12 @@
-import { Box, OrbitControls } from '@react-three/drei'
+import { Box, DeviceOrientationControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { FC, useState } from 'react'
 import { ImagePlane } from './ImagePlane'
 import { WebcamPlane } from './WebCamPlane'
 
-import { ArrowUturnLeftIcon, MinusIcon, PlusIcon, } from '@heroicons/react/24/solid'
+import { ArrowUturnLeftIcon, MinusIcon, PlusIcon, CubeTransparentIcon, ArrowsPointingInIcon } from '@heroicons/react/24/solid'
+import { CamControls } from './CamControls'
+
 
 type Shot = {
     yaw: number;
@@ -18,36 +20,55 @@ const removeFirst = <T,>(shots: T[]) => {
     return rest;
 }
 
-export const Scene: FC = () => {
+type Props = {
+    augmentedPossible: boolean;
+}
+
+
+
+
+const getGradient = (to: string, maskPercentage: number) => `linear-gradient(to ${to}, transparent 0%,  #fff ${maskPercentage}%, #fff ${100 - maskPercentage}%, transparent 100%)`
+
+
+export const Scene: FC<Props> = ({ augmentedPossible }) => {
 
     const [distance, setDistance] = useState(10);
     const [screenshots, setScreenshots] = useState<Shot[]>([]);
 
+    const [augmented, setAugmented] = useState(augmentedPossible);
 
 
+    const maskPercentage = 5;
+
+
+
+    const mask = `${getGradient('left', maskPercentage)},${getGradient('top', maskPercentage)}`
+    console.log(mask);
     return (
         <div className='w-screen h-screen relative'>
 
             <div className='absolute w-full h-full'>
 
-                <Canvas  >
+                <Canvas camera={{ position: [0, 0, 0] }}  >
 
                     {
                         screenshots.map(shot => (
                             <ImagePlane yaw={shot.yaw} pitch={shot.pitch} roll={0} distance={distance}>
-                                <img src={shot.src} />
+
+
+                                <img style={{
+                                    maskComposite: 'intersect',
+                                    maskImage: mask,
+                                }} src={shot.src} />
                             </ImagePlane>
                         ))
                     }
 
-                    <OrbitControls
-                        minZoom={0.001}
-                        maxZoom={0.001}
-                        enablePan={false} // Disable panning
-                        enableZoom={false} // Disable zooming
-                        maxPolarAngle={Math.PI / 2} // Optional: Limit vertical rotation
-                        minPolarAngle={0} // Optional: Limit vertical rotation
-                    />
+                    {augmented ?
+                        <DeviceOrientationControls /> :
+                        <CamControls />
+                    }
+
 
                     <Box position={[0, 0, 0]} />
 
@@ -87,6 +108,13 @@ export const Scene: FC = () => {
                             <PlusIcon className='size-6' />
                         </button>
                     </div>
+
+                    <button
+                        className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => setAugmented(a => !a)}
+                    >
+                        {augmented ? <ArrowsPointingInIcon className='size-6' /> : <CubeTransparentIcon className='size-6' />}
+                    </button>
                 </div>
             </div>
 

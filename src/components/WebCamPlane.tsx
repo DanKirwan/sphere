@@ -6,7 +6,7 @@ import { clamp } from 'lodash';
 
 import { CameraIcon } from '@heroicons/react/24/solid'
 
-const SPEED = 0.001;
+const SPEED = 0.01;
 
 type Props = {
     onScreenshot: (src: string, yaw: number, pitch: number) => void;
@@ -41,16 +41,16 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch'> & Props> = (
                 case 's':
                     return setPitchDelta(d => clamp(d - delta, -1, 1));
 
-                case 'a':
-                    return setYawDelta(d => clamp(d + delta, -1, 1));
                 case 'd':
+                    return setYawDelta(d => clamp(d + delta, -1, 1));
+                case 'a':
                     return setYawDelta(d => clamp(d - delta, -1, 1));
 
             }
         }
 
         const handleKeyDown = handleKeyChange(true);
-        const handleKeyUp = handleKeyChange(true);
+        const handleKeyUp = handleKeyChange(false);
 
 
 
@@ -70,7 +70,6 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch'> & Props> = (
     const [pitch, setPitch] = useState(0);
 
     useFrame(() => {
-        console.log(yaw)
         setYaw(y => y + yawDelta * SPEED)
         setPitch(p => p + pitchDelta * SPEED)
 
