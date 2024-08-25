@@ -1,14 +1,13 @@
 import { useFrame } from '@react-three/fiber';
-import { CSSProperties, FC, useCallback, useRef, useState } from 'react';
+import { CSSProperties, FC } from 'react';
 import Webcam from 'react-webcam';
 import { ImagePlane, ImagePlaneProps } from './ImagePlane';
 
-import { CameraIcon } from '@heroicons/react/24/solid';
 import { Vector3 } from 'three';
+import { useWebcam } from '../contexts/WebcamContext';
 
 
 type Props = {
-    onScreenshot: (src: string, yaw: number, pitch: number, roll: number) => void;
     deviceId?: string;
     webcamStyle?: CSSProperties
 
@@ -18,26 +17,15 @@ type Props = {
 const cameraDir = new Vector3();
 
 
-export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch' | 'roll'> & Props> = ({ onScreenshot, deviceId, webcamStyle, ...rest }) => {
+export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch' | 'roll'> & Props> = ({ deviceId, webcamStyle, ...rest }) => {
     // Set the position of the plane at the specified distance from the origin
 
     const extraStyles = webcamStyle ?? {};
-    const webcamRef = useRef<Webcam | null>(null);
+
+    const { webcamRef, setAngle, angle } = useWebcam();
 
 
-    const capture = useCallback(
-        () => {
-            if (webcamRef.current == null) throw new Error("Cannot screenshot without webcam");
-            const imageSrc = webcamRef.current.getScreenshot();
-            return imageSrc;
-        },
-        [webcamRef]
-    );
-
-    const [yaw, setYaw] = useState(0);
-    const [pitch, setPitch] = useState(0);
-    const [roll, setRoll] = useState(0);
-
+    const { yaw, pitch, roll } = angle;
     useFrame((state) => {
 
         state.camera.getWorldDirection(cameraDir);
@@ -56,9 +44,7 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch' | 'roll'> & P
         const cameraUp = new Vector3(0, 1, 0).applyAxisAngle(cameraDir, Math.PI / 2); // Assuming the camera's original up is (0, 1, 0)
         const roll = Math.acos(cameraUp.dot(referenceUp));
 
-        setYaw(yaw);
-        setPitch(pitch);
-        setRoll(roll);
+        setAngle({ yaw, pitch, roll })
 
 
     });
@@ -80,17 +66,7 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch' | 'roll'> & P
                     />
                 </div>
 
-                <div className='absolute top-1 right-1'>
 
-
-                    <button
-                        onClick={() => onScreenshot(capture() ?? '', yaw, pitch, roll)}
-                        className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
-                    >
-                        <CameraIcon className='size-6' />
-                    </button>
-
-                </div>
             </div>
         </ImagePlane>
     );

@@ -12,6 +12,7 @@ import { ShotPlane } from './ShotPlane'
 import { ArrowsPointingInIcon, ArrowUturnLeftIcon, CubeTransparentIcon } from '@heroicons/react/24/solid'
 import { OutlinePlane } from './OutlinePlane'
 import clsx from 'clsx'
+import { CaptureButton } from './CaptureButton'
 
 
 type Props = {
@@ -56,12 +57,14 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                         {!firstShot ? 'Align photo with blue marker' : (!secondShot ? 'Align photo with green marker' : 'Move slider to align images')}
                     </div>
                 </div>
-                <input
-                    type="range"
-                    value={cameraDistance}
-                    onChange={e => setCameraDistance(+e.target.value)}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                />
+                {firstShot && secondShot &&
+                    <input
+                        type="range"
+                        value={cameraDistance}
+                        onChange={e => setCameraDistance(+e.target.value)}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                    />
+                }
 
                 <div className='flex flex-row align-middle justify-center space-x-2'>
 
@@ -81,6 +84,11 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
 
 
 
+
+                    <CaptureButton onScreenshot={(src, yaw, pitch, roll) => {
+                        if (!firstShot) return setFirstShot({ blur: maskPercentage, pitch, roll, src, yaw });
+                        if (!secondShot) return setSecondShot({ blur: maskPercentage, pitch, roll, src, yaw });
+                    }} />
 
 
 
@@ -119,10 +127,7 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                     <WebcamPlane
                         distance={cameraDistance}
                         webcamStyle={{ opacity: 0.5 }}
-                        onScreenshot={(src, yaw, pitch, roll) => {
-                            if (!firstShot) return setFirstShot({ blur: maskPercentage, pitch, roll, src, yaw });
-                            if (!secondShot) return setSecondShot({ blur: maskPercentage, pitch, roll, src, yaw });
-                        }}
+
                     />
 
                 }

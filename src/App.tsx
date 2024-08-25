@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AccelerometerPermissionDialog } from './components/AccelerometerPermissionDialog';
 import { Alignment } from './components/Alignment';
+import { WebcamProvider } from './contexts/WebcamContext';
 
 function App() {
 
@@ -10,7 +11,6 @@ function App() {
 
   const [permissionGranted, setPermissionGranted] = useState(false);
 
-  console.log(window.DeviceOrientationEvent, augmentedPossible)
   return (
 
     augmentedPossible && !permissionGranted ?
@@ -19,7 +19,11 @@ function App() {
         setPermissionGranted={setPermissionGranted}
       /> :
 
-      <Alignment augmentedPossible={permissionGranted && augmentedPossible} />
+      <WebcamProvider>
+        {/* Everything under this provider seems to get reloaded */}
+
+        <Alignment augmentedPossible={permissionGranted && augmentedPossible} />
+      </WebcamProvider>
 
   )
 }
