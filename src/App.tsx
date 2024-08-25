@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Scene } from './components/Scene'
 import { AccelerometerPermissionDialog } from './components/AccelerometerPermissionDialog';
+import { Alignment } from './components/Alignment';
 
 function App() {
 
@@ -19,11 +19,14 @@ function App() {
         setPermissionGranted={setPermissionGranted}
       /> :
 
-      <Scene
-        augmentedPossible={permissionGranted && augmentedPossible}
-      />
+      <Alignment augmentedPossible={permissionGranted && augmentedPossible} />
 
   )
 }
+
+
+{/* <Scene
+augmentedPossible={permissionGranted && augmentedPossible}
+/> */}
 
 export default App
