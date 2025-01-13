@@ -49,14 +49,12 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch' | 'roll'> & P
 
     });
 
+
     return (
         <ImagePlane {...rest} roll={roll} yaw={yaw} pitch={pitch} forceFront>
             <div className='relative z-10'>
-
                 <div style={extraStyles}>
-
                     <Webcam
-
                         videoConstraints={{
                             facingMode: 'environment'
                         }}
@@ -65,8 +63,6 @@ export const WebcamPlane: FC<Omit<ImagePlaneProps, 'yaw' | 'pitch' | 'roll'> & P
                         screenshotFormat="image/jpeg"
                     />
                 </div>
-
-
             </div>
         </ImagePlane>
     );

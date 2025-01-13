@@ -34,12 +34,12 @@ export const ImagePlane: FC<ImagePlaneProps & { children: ReactNode }> = ({ yaw,
         meshRef.current.lookAt(new Vector3(0, 0, 0));
     });
 
+
     return (
         <mesh ref={meshRef} >
-            <planeGeometry args={[1, 1]} /> {/* Adjust size of the plane here */}
+            <planeGeometry args={[1, 1]} />
             <meshBasicMaterial color="lightblue" />
             <Html transform zIndexRange={forceFront ? [1, 1] : [0, 0]}>
-
                 {children}
             </Html>
         </mesh>
