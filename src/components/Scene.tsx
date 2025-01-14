@@ -35,22 +35,14 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
     const [mediaDevices, setMediaDevices] = useState<MediaDeviceInfo[]>([]);
 
     useEffect(() => {
-        const webcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-        if (navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-                .then(function (stream) {
-                    //Display the video stream in the video object
-                })
-                .catch(function (e) { logError(e.name + ": " + e.message); });
-        }
-        else {
-            navigator.getWebcam({ audio: true, video: true },
-                function (stream) {
-                    //Display the video stream in the video object
-                },
-                function () { logError("Web cam is not accessible."); });
+        if (navigator.mediaDevices.enumerateDevices) {
+            navigator.mediaDevices.enumerateDevices().then(d => setMediaDevices(d.filter(d => d.kind == 'videoinput')));
+
+        } else {
+            console.error("Could not set available media devices");
         }
 
+        navigator.mediaDevices.enumerateDevices().then(d => setMediaDevices(d.filter(d => d.kind == 'videoinput')));
 
     }, [])
 
@@ -99,7 +91,7 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
                     </button>
 
                     <CaptureButton
-                        onScreenshot={(src, yaw, pitch, roll) => setScreenshots(shots => [{ src, yaw, pitch, roll, blur: maskPercentage }, ...shots])}
+                        onScreenshot={(src, rotation) => setScreenshots(shots => [{ src, rotation, blur: maskPercentage }, ...shots])}
 
                     />
 
@@ -108,15 +100,15 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
                 </div>
             }
         >
-            <Canvas camera={{ position: [0, 0, 0] }}  >
+            <Canvas camera={{ position: [0, 0, 0], fov: 140 }}  >
 
 
                 <CaptureEquirectButton />
 
 
                 {
-                    screenshots.map(shot => (
-                        <ShotPlane shot={shot} distance={distance} />
+                    screenshots.map((shot, index) => (
+                        <ShotPlane shot={shot} distance={distance} index={index} />
                     ))
                 }
 

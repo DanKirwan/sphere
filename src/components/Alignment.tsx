@@ -1,6 +1,6 @@
 import { Box, DeviceOrientationControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { FC, useState } from 'react'
+import { FC, useMemo, useState } from 'react'
 import { WebcamPlane } from './WebCamPlane'
 
 import { Layout } from '../Layout'
@@ -13,6 +13,7 @@ import { ArrowsPointingInIcon, ArrowUturnLeftIcon, CubeTransparentIcon } from '@
 import { OutlinePlane } from './OutlinePlane'
 import clsx from 'clsx'
 import { CaptureButton } from './CaptureButton'
+import { Euler, Quaternion } from 'three'
 
 
 type Props = {
@@ -42,6 +43,9 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
     }
 
     const hidden = firstShot && secondShot;
+
+    const initialRotation = useMemo(() => new Quaternion().setFromEuler(new Euler(0, 0, 0)), []);
+    const shiftedRotation = useMemo(() => new Quaternion().setFromEuler(new Euler(0, -0.5, 0)), []);
 
     return (
         <Layout bottomControls={
@@ -85,9 +89,9 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
 
 
 
-                    <CaptureButton onScreenshot={(src, yaw, pitch, roll) => {
-                        if (!firstShot) return setFirstShot({ blur: maskPercentage, pitch, roll, src, yaw });
-                        if (!secondShot) return setSecondShot({ blur: maskPercentage, pitch, roll, src, yaw });
+                    <CaptureButton onScreenshot={(src, rotation) => {
+                        if (!firstShot) return setFirstShot({ blur: maskPercentage, rotation: rotation.clone(), src });
+                        if (!secondShot) return setSecondShot({ blur: maskPercentage, rotation: rotation.clone(), src });
                     }} />
 
 
@@ -108,12 +112,12 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
             <Canvas camera={{ position: [0, 0, 0] }}  >
 
 
-                {firstShot && <ShotPlane shot={firstShot} distance={cameraDistance} disableMask imageStyle={{ opacity: 0.5, filter: "sepia(100%) saturate(300%) brightness(70%) hue-rotate(180deg)" }} />}
-                {secondShot && <ShotPlane shot={secondShot} distance={cameraDistance} disableMask imageStyle={{ opacity: 0.5, filter: "sepia(100%) saturate(300%) brightness(70%) hue-rotate(90deg)" }} />}
+                {firstShot && <ShotPlane index={2} shot={firstShot} distance={cameraDistance} disableMask imageStyle={{ opacity: 0.5, filter: "sepia(100%) saturate(300%) brightness(70%) hue-rotate(180deg)" }} />}
+                {secondShot && <ShotPlane index={3} shot={secondShot} distance={cameraDistance} disableMask imageStyle={{ opacity: 0.5, filter: "sepia(100%) saturate(300%) brightness(70%) hue-rotate(90deg)" }} />}
 
 
-                {!firstShot && !secondShot && <OutlinePlane distance={cameraDistance} yaw={0} pitch={0} roll={0} color={clsx('bg-blue-700')}></OutlinePlane>}
-                {firstShot && !secondShot && <OutlinePlane distance={cameraDistance} yaw={0.5} pitch={0} roll={0} color={clsx('bg-green-700')}></OutlinePlane>}
+                {!firstShot && !secondShot && <OutlinePlane zIndex={1} distance={cameraDistance} rotation={initialRotation} color={clsx('bg-blue-700')}></OutlinePlane>}
+                {firstShot && !secondShot && <OutlinePlane zIndex={1} distance={cameraDistance} rotation={shiftedRotation} color={clsx('bg-green-700')}></OutlinePlane>}
 
                 {augmented ?
                     <DeviceOrientationControls /> :

@@ -1,15 +1,16 @@
 import { CameraIcon } from '@heroicons/react/24/outline';
 import { FC } from 'react';
 import { useWebcam } from '../contexts/WebcamContext';
+import { Quaternion } from 'three';
 
 type Props = {
-    onScreenshot: (src: string, yaw: number, pitch: number, roll: number) => void;
+    onScreenshot: (src: string, rotation: Quaternion) => void;
 
 }
 
 export const CaptureButton: FC<Props> = ({ onScreenshot }) => {
 
-    const { capture, angle } = useWebcam();
+    const { capture, rotationRef } = useWebcam();
 
     // TODO this needs to be either inside react canvas or it needs to be got somehow else
 
@@ -17,10 +18,8 @@ export const CaptureButton: FC<Props> = ({ onScreenshot }) => {
         const imgSrc = capture();
 
         if (!imgSrc) return;
-        const { yaw, pitch, roll } = angle;
 
-
-        onScreenshot(imgSrc, yaw, pitch, roll);
+        onScreenshot(imgSrc, rotationRef.current.clone());
 
 
     }

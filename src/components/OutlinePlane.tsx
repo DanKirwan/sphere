@@ -1,14 +1,15 @@
 import { FC } from 'react';
-import { ImagePlane, ImagePlaneProps } from './ImagePlane';
+import { PlaneProps } from './DisplayPlane';
 import clsx from 'clsx';
+import { HtmlPlane } from './HtmlPlane';
 
 
 type Props = {
     color: string
 }
-export const OutlinePlane: FC<ImagePlaneProps & Props> = ({ color, ...rest }) => {
+export const OutlinePlane: FC<PlaneProps & Props> = ({ color, ...rest }) => {
     return (
-        <ImagePlane {...rest}>
+        <HtmlPlane {...rest}>
             <div className="relative p-6 m-10 text-white text-center rounded-lg">
                 <div className={clsx(
                     "absolute inset-0 border-2 border-transparent rounded-lg animate-pulse",
@@ -18,6 +19,6 @@ export const OutlinePlane: FC<ImagePlaneProps & Props> = ({ color, ...rest }) =>
 
                 </div>
             </div>
-        </ImagePlane>
+        </HtmlPlane>
     )
 }

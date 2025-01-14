@@ -1,24 +1,21 @@
 import { createContext, FC, MutableRefObject, ReactNode, useCallback, useContext, useRef, useState } from "react";
 import Webcam from "react-webcam";
+import { Quaternion } from "three";
 interface IWebcamContext {
-    webcamRef: MutableRefObject<Webcam | undefined>;
+    webcamRef: MutableRefObject<Webcam | null>;
     capture: () => string | null;
-    angle: Angle
-    setAngle: (angle: Angle) => void;
+    rotationRef: MutableRefObject<Quaternion>;
 }
 
 
-type Angle = {
-    yaw: number;
-    pitch: number;
-    roll: number;
-}
+
+
 export const WebcamContext = createContext({} as IWebcamContext);
 
 export const WebcamProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const webcamRef = useRef<Webcam>();
+    const webcamRef = useRef<Webcam | null>(null);
+    const rotationRef = useRef<Quaternion>(new Quaternion());
 
-    const [angle, setAngle] = useState<Angle>({ yaw: 0, pitch: 0, roll: 0 });
 
 
     const capture = useCallback(
@@ -30,7 +27,7 @@ export const WebcamProvider: FC<{ children: ReactNode }> = ({ children }) => {
         [webcamRef]
     );
     return (
-        <WebcamContext.Provider value={{ webcamRef, capture, angle, setAngle }}>
+        <WebcamContext.Provider value={{ webcamRef, capture, rotationRef }}>
             {children}
         </WebcamContext.Provider>
     );

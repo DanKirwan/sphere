@@ -12,15 +12,17 @@ class LocalStoredData {
 }
 
 const isPrimitive = (v: any) => v === null || !(v instanceof Object || v instanceof Function);
+
 const objectify = <T>(obj: T): any => {
     if (isPrimitive(obj)) return { value: obj };
     if (Array.isArray(obj)) return obj;
+    if (typeof obj !== 'object') return obj;
     const mapped = Object.entries(obj).map(([key, value]) => [key, objectify(value)]);
     return Object.fromEntries(mapped);
 }
 const unobjectify = <T>(obj: T): any => {
     if (Array.isArray(obj) || !obj) return obj;
-    const mapped = Object.entries(obj).map(([key, value]) => value && value['value'] !== void 0 && isPrimitive(value['value']) ?
+    const mapped = Object.entries(obj).map(([key, value]) => value && typeof value == 'object' && 'value' in value && value['value'] !== void 0 && isPrimitive(value['value']) ?
         [key, value['value']] :
         [key, Array.isArray(value) ? value : unobjectify(value)]
     );

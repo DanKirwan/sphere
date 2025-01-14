@@ -1,9 +1,8 @@
+import { Quaternion } from "three";
 
 
 export type Shot = {
-    yaw: number;
-    pitch: number;
-    roll: number;
+    rotation: Quaternion;
     blur: number;
     src: string;
 }
