@@ -1,10 +1,11 @@
-import { createContext, FC, MutableRefObject, ReactNode, useCallback, useContext, useRef, useState } from "react";
+import { createContext, FC, MutableRefObject, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Quaternion } from "three";
 interface IWebcamContext {
     webcamRef: MutableRefObject<Webcam | null>;
     capture: () => string | null;
     rotationRef: MutableRefObject<Quaternion>;
+    dimensions: { width: number, height: number };
 }
 
 
@@ -26,8 +27,34 @@ export const WebcamProvider: FC<{ children: ReactNode }> = ({ children }) => {
         },
         [webcamRef]
     );
+
+
+
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+    useEffect(() => {
+        const updateDimensions = () => {
+            if (webcamRef.current) {
+                const video = webcamRef.current?.video;
+                if (video) {
+                    setDimensions({
+                        width: video.videoWidth,
+                        height: video.videoHeight,
+                    });
+                }
+            }
+        };
+
+        // Call it once initially
+        updateDimensions();
+
+        // Optional: Add resize listener if needed
+        window.addEventListener('resize', updateDimensions);
+
+        return () => window.removeEventListener('resize', updateDimensions);
+    }, []);
     return (
-        <WebcamContext.Provider value={{ webcamRef, capture, rotationRef }}>
+        <WebcamContext.Provider value={{ webcamRef, capture, rotationRef, dimensions }}>
             {children}
         </WebcamContext.Provider>
     );

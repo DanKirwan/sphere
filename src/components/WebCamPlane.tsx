@@ -14,12 +14,12 @@ type Props = {
 }
 
 
-export const WebcamPlane: FC<Omit<PlaneProps, 'rotation' | 'zIndex'> & Props> = ({ deviceId, webcamStyle, ...rest }) => {
+export const WebcamPlane: FC<Pick<PlaneProps, 'distance'> & Props> = ({ deviceId, webcamStyle, ...rest }) => {
     // Set the position of the plane at the specified distance from the origin
 
     const extraStyles = webcamStyle ?? {};
 
-    const { webcamRef, rotationRef } = useWebcam();
+    const { webcamRef, rotationRef, dimensions } = useWebcam();
 
 
     useFrame((state) => {
@@ -27,25 +27,28 @@ export const WebcamPlane: FC<Omit<PlaneProps, 'rotation' | 'zIndex'> & Props> = 
         if (!rotationRef.current) return;
         state.camera.getWorldQuaternion(rotationRef.current);
     });
+    console.log(dimensions)
 
 
 
     return (
-        <HtmlPlane {...rest} rotation={rotationRef.current} zIndex={MAX_IMAGE_COUNT + 1}>
-            <div className='relative z-10'>
-                <div style={extraStyles}>
-                    <Webcam
-                        videoConstraints={{
+        <HtmlPlane {...rest} rotation={rotationRef.current} zIndex={MAX_IMAGE_COUNT + 1} {...dimensions} >
+            {/* <div className='bg-slate-500 w-full h-full'>
+                TEST
+            </div> */}
+            {/* <div className='relative z-10'> */}
+            {/* <div style={extraStyles}> */}
+            <Webcam
+                videoConstraints={{
+                    facingMode: 'environment'
 
-                            facingMode: 'environment'
-
-                        }}
-                        id={deviceId}
-                        ref={webcamRef}
-                        screenshotFormat="image/jpeg"
-                    />
-                </div>
-            </div>
+                }}
+                id={deviceId}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+            />
+            {/* </div> */}
+            {/* </div> */}
         </HtmlPlane>
     );
 }

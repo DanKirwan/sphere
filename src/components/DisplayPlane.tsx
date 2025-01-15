@@ -1,4 +1,3 @@
-import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { FC, ReactNode, useRef } from 'react';
 import { Mesh, Quaternion, Vector3 } from 'three';
@@ -7,14 +6,15 @@ import { FORWARD_VECTOR } from '../lib/consts';
 export type PlaneProps = {
     rotation: Quaternion;
     distance: number;
-    zIndex: number;
+    width: number;
+    height: number;
 
 }
 
 
 
 
-export const DisplayPlane: FC<PlaneProps & { children: ReactNode }> = ({ rotation, distance, children, zIndex }) => {
+export const DisplayPlane: FC<PlaneProps & { children: ReactNode }> = ({ rotation, distance, width, height, children }) => {
     // Set the position of the plane at the specified distance from the origin
 
     const meshRef = useRef<Mesh | null>(null);
@@ -41,11 +41,9 @@ export const DisplayPlane: FC<PlaneProps & { children: ReactNode }> = ({ rotatio
 
     return (
         <mesh ref={meshRef} >
-            <planeGeometry args={[20, 16]} />
+            <planeGeometry args={[width, height]} />
             <meshBasicMaterial color="lightblue" />
-            {/* <Html transform zIndexRange={[zIndex, zIndex]} style={{ pointerEvents: 'none' }}> */}
             {children}
-            {/* </Html> */}
         </mesh>
     );
 }

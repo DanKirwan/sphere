@@ -4,6 +4,7 @@ import { HtmlPlane } from './HtmlPlane';
 import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 import { DisplayPlane } from './DisplayPlane';
+import { useImageMetadata } from '../lib/hooks';
 
 type Props = {
     shot: Shot;
@@ -21,19 +22,22 @@ export const ShotPlane: FC<Props> = ({ shot, distance, index, imageStyle = {}, d
     const { rotation, blur, src } = shot;
     const texture = useLoader(TextureLoader, src);
 
-    const mask = `${getGradient('left', blur)},${getGradient('top', blur)}`
+    const { dimensions, isLoading } = useImageMetadata(src);
 
-    const maskStyles: CSSProperties = disableMask ? {} : { maskComposite: 'intersect', maskImage: mask };
 
+    // const mask = `${getGradient('left', blur)},${getGradient('top', blur)}`
+
+    // const maskStyles: CSSProperties = disableMask ? {} : { maskComposite: 'intersect', maskImage: mask };
+
+
+    // TODO maybe add suspense somehow?
+    if (isLoading) return null;
+
+
+    // TODO This shouldn't need to be 10
     return (
-        <DisplayPlane rotation={rotation} distance={distance} zIndex={index} >
+        <DisplayPlane rotation={rotation} distance={distance * 10} {...dimensions}  >
             <meshBasicMaterial map={texture} />
-
-            {/* <img style={{
-                ...maskStyles,
-                ...imageStyle,
-                pointerEvents: 'none'
-            }} src={src} /> */}
         </DisplayPlane >
     )
 }

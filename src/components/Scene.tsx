@@ -58,7 +58,7 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
 
         <Layout
             bottomControls={
-                <div className='flex flex-row align-middle justify-center space-x-2'>
+                <div className='flex flex-row align-middle justify-center space-x-2 '>
                     <button
                         className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
                         onClick={() => setScreenshots(shots => removeFirst(shots))}
@@ -100,7 +100,7 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
                 </div>
             }
         >
-            <Canvas camera={{ position: [0, 0, 0], fov: 140 }}  >
+            <Canvas camera={{ position: [0, 0, 0], fov: 100 }}  >
 
 
                 <CaptureEquirectButton />

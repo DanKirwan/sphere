@@ -44,8 +44,8 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
 
     const hidden = firstShot && secondShot;
 
-    const initialRotation = useMemo(() => new Quaternion().setFromEuler(new Euler(0, 0, 0)), []);
-    const shiftedRotation = useMemo(() => new Quaternion().setFromEuler(new Euler(0, -0.5, 0)), []);
+    const initialRotation = useMemo(() => new Quaternion().setFromEuler(new Euler(0, -Math.PI / 2, 0)), []);
+    const shiftedRotation = useMemo(() => new Quaternion().setFromEuler(new Euler(0, -Math.PI / 2 - Math.PI / 8, 0)), []);
 
     return (
         <Layout bottomControls={
@@ -64,6 +64,8 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                 {firstShot && secondShot &&
                     <input
                         type="range"
+                        min={50}
+                        max={200}
                         value={cameraDistance}
                         onChange={e => setCameraDistance(+e.target.value)}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
