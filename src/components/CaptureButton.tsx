@@ -19,7 +19,7 @@ export const CaptureButton: FC<Props> = ({ onScreenshot }) => {
 
         if (!imgSrc) return;
 
-        onScreenshot(imgSrc, rotationRef.current.clone());
+        onScreenshot(imgSrc, rotationRef.current!.clone());
 
 
     }

@@ -45,7 +45,6 @@ export const DisplayPlane: FC<PlaneProps & { children: ReactNode }> = ({ rotatio
     return (
         <mesh ref={meshRef} >
             <planeGeometry args={[displayWidth, displayHeight]} />
-            <meshBasicMaterial color="lightblue" />
             {children}
         </mesh>
     );

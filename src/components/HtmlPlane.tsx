@@ -8,12 +8,13 @@ type ExtraProps = {
     children: ReactNode;
     zIndex: number;
 }
-export const HtmlPlane: FC<PlaneProps & ExtraProps> = ({ children, zIndex, ...rest }) => {
+export const HtmlPlane: FC<PlaneProps & ExtraProps> = ({ children, zIndex, distance, ...rest }) => {
 
     // TODO Distance factor here is completely arbitrary
     return (
-        <DisplayPlane {...rest}>
-            <Html transform zIndexRange={[zIndex, zIndex]} style={{ pointerEvents: 'none' }} className='bg-blue-700' distanceFactor={44} >
+        <DisplayPlane distance={distance + 1} {...rest}>
+            <meshBasicMaterial opacity={0} />
+            <Html transform zIndexRange={[zIndex, zIndex]} style={{ pointerEvents: 'none' }} >
                 {children}
             </Html>
         </DisplayPlane >

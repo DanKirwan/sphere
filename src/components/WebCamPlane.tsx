@@ -4,25 +4,18 @@ import { useWebcam } from '../contexts/WebcamContext';
 import { DisplayPlane, PlaneProps } from './DisplayPlane';
 import { useFrame } from '@react-three/fiber';
 
-
 type Props = {
-    deviceId?: string;
-    webcamStyle?: CSSProperties
-
+    opacity?: number;
 }
-
-
-export const WebcamPlane: FC<Pick<PlaneProps, 'distance'> & Props> = ({ deviceId, webcamStyle, ...rest }) => {
+export const WebcamPlane: FC<Pick<PlaneProps, 'distance'> & Props> = ({ opacity, ...rest }) => {
     // Set the position of the plane at the specified distance from the origin
 
-    const extraStyles = webcamStyle ?? {};
 
     const { videoRef, rotationRef, dimensions } = useWebcam();
     const [videoTexture, setVideoTexture] = useState<VideoTexture | null>(null);
 
 
     useFrame((state) => {
-
         if (!rotationRef.current) return;
         state.camera.getWorldQuaternion(rotationRef.current);
     });
@@ -46,9 +39,9 @@ export const WebcamPlane: FC<Pick<PlaneProps, 'distance'> & Props> = ({ deviceId
     const { width, height } = dimensions;
 
     return (
-        <DisplayPlane rotation={rotationRef.current} distance={rest.distance} height={width} width={height}>
+        <DisplayPlane rotation={rotationRef.current!} distance={rest.distance} height={height} width={width}>
 
-            <meshBasicMaterial map={videoTexture} />
+            <meshBasicMaterial map={videoTexture} opacity={opacity ?? 1} />
         </DisplayPlane>
     );
 }

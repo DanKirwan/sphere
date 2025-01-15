@@ -5,6 +5,7 @@ const LOCAL_STORED_DATA = 'localStoredData';
 class LocalSettingsData {
     distance: number = 10;
     maskPercentage: number = 5;
+    fov: number = 140;
 }
 
 class LocalStoredData {

@@ -14,6 +14,7 @@ import { OutlinePlane } from './OutlinePlane'
 import clsx from 'clsx'
 import { CaptureButton } from './CaptureButton'
 import { Euler, Quaternion } from 'three'
+import { CameraSelectorButton } from './CameraSelectorButton'
 
 
 type Props = {
@@ -24,7 +25,7 @@ type Props = {
 export const Alignment: FC<Props> = ({ augmentedPossible }) => {
 
 
-    const { distance: settingDistance, maskPercentage } = localStoredData.get(data => data.settings);
+    const { distance: settingDistance, maskPercentage, fov } = localStoredData.get(data => data.settings);
     const [cameraDistance, setCameraDistance] = useState(settingDistance);
     const [augmented, setAugmented] = useState(augmentedPossible);
 
@@ -64,6 +65,7 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                 {firstShot && secondShot &&
                     <input
                         type="range"
+                        step={0.001}
                         min={5}
                         max={20}
                         value={cameraDistance}
@@ -88,6 +90,8 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                         <ArrowUturnLeftIcon className='size-6' />
                     </button>
 
+                    <CameraSelectorButton />
+
 
 
 
@@ -111,15 +115,17 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
 
         }>
 
-            <Canvas camera={{ position: [0, 0, 0] }}  >
+            {/* TODO remove the background from outline planes */}
+            <Canvas camera={{ position: [0, 0, 0], fov: 140 }}  >
 
 
                 {firstShot && <ShotPlane index={2} shot={firstShot} distance={cameraDistance} disableMask imageStyle={{ opacity: 0.5, filter: "sepia(100%) saturate(300%) brightness(70%) hue-rotate(180deg)" }} />}
                 {secondShot && <ShotPlane index={3} shot={secondShot} distance={cameraDistance} disableMask imageStyle={{ opacity: 0.5, filter: "sepia(100%) saturate(300%) brightness(70%) hue-rotate(90deg)" }} />}
 
 
-                {!firstShot && !secondShot && <OutlinePlane width={10} height={10} distance={cameraDistance} rotation={initialRotation} color={clsx('bg-blue-700')}></OutlinePlane>}
-                {firstShot && !secondShot && <OutlinePlane width={10} height={10} distance={cameraDistance} rotation={shiftedRotation} color={clsx('bg-green-700')}></OutlinePlane>}
+
+                {!firstShot && !secondShot && <OutlinePlane width={1} height={1} distance={cameraDistance} rotation={initialRotation} color={clsx('bg-blue-700')}></OutlinePlane>}
+                {firstShot && !secondShot && <OutlinePlane width={1} height={1} distance={cameraDistance} rotation={shiftedRotation} color={clsx('bg-green-700')}></OutlinePlane>}
 
                 {augmented ?
                     <DeviceOrientationControls /> :
@@ -132,7 +138,7 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                 {!hidden &&
                     <WebcamPlane
                         distance={cameraDistance}
-                        webcamStyle={{ opacity: 0.5 }}
+                        opacity={0.5}
 
                     />
 

@@ -12,6 +12,8 @@ import { ShotPlane } from './ShotPlane'
 import { Layout } from '../Layout'
 import { CaptureButton } from './CaptureButton'
 import { CaptureEquirectButton } from './CaptureEquirectButton'
+import { useWebcam } from '../contexts/WebcamContext'
+import { CameraSelectorButton } from './CameraSelectorButton'
 
 
 type Props = {
@@ -21,37 +23,19 @@ type Props = {
 
 export const Scene: FC<Props> = ({ augmentedPossible }) => {
 
-    const { distance, maskPercentage } = localStoredData.get(data => data.settings);
-
-
+    const { distance, maskPercentage, fov } = localStoredData.get(data => data.settings);
     const [screenshots, setScreenshots] = useState<Shot[]>([]);
-
     const [hidden, setHidden] = useState(false);
-
     const [augmented, setAugmented] = useState(augmentedPossible);
 
 
 
-    const [mediaDevices, setMediaDevices] = useState<MediaDeviceInfo[]>([]);
-
-    useEffect(() => {
-        if (navigator.mediaDevices.enumerateDevices) {
-            navigator.mediaDevices.enumerateDevices().then(d => setMediaDevices(d.filter(d => d.kind == 'videoinput')));
-
-        } else {
-            console.error("Could not set available media devices");
-        }
-
-        navigator.mediaDevices.enumerateDevices().then(d => setMediaDevices(d.filter(d => d.kind == 'videoinput')));
-
-    }, [])
-
-    const [selectedDeviceIndex, setSelectedDeviceIndex] = useState(0);
-
-    const selectedDevice = mediaDevices.length == 0 ? null : mediaDevices[selectedDeviceIndex];
+    const { availableDevices, selectedDeviceId, setSelectedDeviceId } = useWebcam();
 
     const cycleDevice = () => {
-        setSelectedDeviceIndex(x => (x + 1) % mediaDevices.length);
+        const currentIndex = availableDevices.findIndex(x => x.deviceId === selectedDeviceId);
+
+        setSelectedDeviceId(availableDevices[(currentIndex + 1) % availableDevices.length].deviceId);
     }
 
     return (
@@ -74,15 +58,7 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
                         {augmented ? <ArrowsPointingInIcon className='size-6' /> : <CubeTransparentIcon className='size-6' />}
                     </button>
 
-                    {mediaDevices.length > 1 &&
-                        <button
-                            className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
-                            onClick={() => cycleDevice()}
-                        >
-                            <ArrowPathRoundedSquareIcon className='size-6' />
-                        </button>
-                    }
-
+                    <CameraSelectorButton />
                     <button
                         className="inline-flex bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
                         onClick={() => setHidden(h => !h)}
@@ -100,7 +76,7 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
                 </div>
             }
         >
-            <Canvas camera={{ position: [0, 0, 0], fov: 100 }}  >
+            <Canvas camera={{ position: [0, 0, 0], fov: 140 }}  >
 
 
                 <CaptureEquirectButton />
@@ -122,11 +98,7 @@ export const Scene: FC<Props> = ({ augmentedPossible }) => {
 
 
                 {!hidden &&
-                    <WebcamPlane
-                        deviceId={selectedDevice?.deviceId}
-                        distance={distance}
-                    />
-
+                    <WebcamPlane distance={distance} />
                 }
 
             </Canvas>
