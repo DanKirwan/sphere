@@ -10,7 +10,7 @@ export const CaptureEquirectButton: React.FC = () => {
 
     // Create a CubeRenderTarget on mount
     // (or you can create it once outside the component)
-    const cubeRT = new THREE.WebGLCubeRenderTarget(1024, {
+    const cubeRT = new THREE.WebGLCubeRenderTarget(2048, {
         format: THREE.RGBAFormat,
         generateMipmaps: false,
         type: THREE.UnsignedByteType,
@@ -31,9 +31,8 @@ export const CaptureEquirectButton: React.FC = () => {
 
         // 2) Convert the resulting cube map into equirectangular
         const equirectCanvas = cubeToEquirectangular(gl, cubeRT.texture, {
-            width: 2048,
-            height: 1024,
-            flipX: 1.0,
+            width: 4096,
+            height: 2048,
         });
 
         // 3) Convert to data URL (PNG) and download

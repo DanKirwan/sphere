@@ -100,7 +100,7 @@ export function cubeToEquirectangular(
     equirectRT.texture.name = 'EquirectangularRenderTarget';
 
     // 2) Set up an orthographic camera (covers the whole screen quad from -1..1)
-    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const camera = new OrthographicCamera(-1, 1, -1, 1, 0, 1);
 
     // 3) Create a scene and a plane geometry for the full-screen quad
     const scene = new Scene();
