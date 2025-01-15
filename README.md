@@ -1,50 +1,27 @@
-# React + TypeScript + Vite
+# Spherical Photo Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A **web app** for generating spherical photos.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Capture spherical photos using your webcam.
+- Export spherical photos in various formats.
+- Responsive and user-friendly design.
+- Designed to work offline as a Progressive Web App (future enhancement).
 
-## Expanding the ESLint configuration
+## Planned
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **PWA Support**: Framework for offline capabilities
+- **Inidividual Photo Editing**: Allow for custom feathering or editing of individual photos 
+- **Exposure Lock**: Manual setting of exposure to stop photo edges from differing exposures=
+- **Multiple Output Formats**: Currently only supports JPEG but hopefully later supporting other formats 
+- **Online Storage and Editing**: Allowing for mobile capture and stoage of images for later editing and exporting on desktop (maybe)
 
-- Configure the top-level `parserOptions` property like this:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## License
+This project is licensed under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Contributions
+- Dan Kirwan
