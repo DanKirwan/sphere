@@ -1,10 +1,8 @@
-import { useFrame } from '@react-three/fiber';
-import { CSSProperties, FC } from 'react';
-import Webcam from 'react-webcam';
-import { PlaneProps } from './DisplayPlane';
+import { CSSProperties, FC, useEffect, useState } from 'react';
+import { LinearFilter, RGBFormat, VideoTexture } from 'three';
 import { useWebcam } from '../contexts/WebcamContext';
-import { MAX_IMAGE_COUNT } from '../lib/consts';
-import { HtmlPlane } from './HtmlPlane';
+import { DisplayPlane, PlaneProps } from './DisplayPlane';
+import { useFrame } from '@react-three/fiber';
 
 
 type Props = {
@@ -19,7 +17,8 @@ export const WebcamPlane: FC<Pick<PlaneProps, 'distance'> & Props> = ({ deviceId
 
     const extraStyles = webcamStyle ?? {};
 
-    const { webcamRef, rotationRef, dimensions } = useWebcam();
+    const { videoRef, rotationRef, dimensions } = useWebcam();
+    const [videoTexture, setVideoTexture] = useState<VideoTexture | null>(null);
 
 
     useFrame((state) => {
@@ -27,28 +26,29 @@ export const WebcamPlane: FC<Pick<PlaneProps, 'distance'> & Props> = ({ deviceId
         if (!rotationRef.current) return;
         state.camera.getWorldQuaternion(rotationRef.current);
     });
-    console.log(dimensions)
 
 
+    // Create a js VideoTexture once the video is ready
+    useEffect(() => {
+        if (videoRef.current) {
+            const texture = new VideoTexture(videoRef.current);
+            texture.minFilter = LinearFilter;
+            texture.magFilter = LinearFilter;
+            texture.format = RGBFormat;
+            setVideoTexture(texture);
+        }
+    }, [videoRef]);
+
+    if (!videoTexture) return null;
+
+    // Preserve aspect ratio in 3D
+    // For example, choose a plane width of 2, then compute height from ratio
+    const { width, height } = dimensions;
 
     return (
-        <HtmlPlane {...rest} rotation={rotationRef.current} zIndex={MAX_IMAGE_COUNT + 1} {...dimensions} >
-            {/* <div className='bg-slate-500 w-full h-full'>
-                TEST
-            </div> */}
-            {/* <div className='relative z-10'> */}
-            {/* <div style={extraStyles}> */}
-            <Webcam
-                videoConstraints={{
-                    facingMode: 'environment'
+        <DisplayPlane rotation={rotationRef.current} distance={rest.distance} height={width} width={height}>
 
-                }}
-                id={deviceId}
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-            />
-            {/* </div> */}
-            {/* </div> */}
-        </HtmlPlane>
+            <meshBasicMaterial map={videoTexture} />
+        </DisplayPlane>
     );
 }

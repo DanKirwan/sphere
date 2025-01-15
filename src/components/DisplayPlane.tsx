@@ -1,7 +1,8 @@
 import { useFrame } from '@react-three/fiber';
 import { FC, ReactNode, useRef } from 'react';
 import { Mesh, Quaternion, Vector3 } from 'three';
-import { FORWARD_VECTOR } from '../lib/consts';
+import { FORWARD_VECTOR, MAX_PLANE_SIZE } from '../lib/consts';
+import { adjustSize } from '../lib/aspectRatio';
 
 export type PlaneProps = {
     rotation: Quaternion;
@@ -39,9 +40,11 @@ export const DisplayPlane: FC<PlaneProps & { children: ReactNode }> = ({ rotatio
     });
 
 
+    const { width: displayWidth, height: displayHeight } = adjustSize(width, height, MAX_PLANE_SIZE);
+
     return (
         <mesh ref={meshRef} >
-            <planeGeometry args={[width, height]} />
+            <planeGeometry args={[displayWidth, displayHeight]} />
             <meshBasicMaterial color="lightblue" />
             {children}
         </mesh>

@@ -36,7 +36,7 @@ export const ShotPlane: FC<Props> = ({ shot, distance, index, imageStyle = {}, d
 
     // TODO This shouldn't need to be 10
     return (
-        <DisplayPlane rotation={rotation} distance={distance * 10} {...dimensions}  >
+        <DisplayPlane rotation={rotation} distance={distance} {...dimensions}  >
             <meshBasicMaterial map={texture} />
         </DisplayPlane >
     )

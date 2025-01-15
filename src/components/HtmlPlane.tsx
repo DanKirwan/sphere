@@ -13,7 +13,7 @@ export const HtmlPlane: FC<PlaneProps & ExtraProps> = ({ children, zIndex, ...re
     // TODO Distance factor here is completely arbitrary
     return (
         <DisplayPlane {...rest}>
-            <Html transform zIndexRange={[zIndex, zIndex]} style={{ pointerEvents: 'none' }} className='bg-blue-700' distanceFactor={45} >
+            <Html transform zIndexRange={[zIndex, zIndex]} style={{ pointerEvents: 'none' }} className='bg-blue-700' distanceFactor={44} >
                 {children}
             </Html>
         </DisplayPlane >

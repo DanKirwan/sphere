@@ -8,3 +8,5 @@ export const RIGHT_VECTOR = new Vector3(1, 0, 0)
 
 
 export const MAX_IMAGE_COUNT = 100;
+
+export const MAX_PLANE_SIZE = 10;

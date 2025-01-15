@@ -9,7 +9,7 @@ type Props = {
 }
 export const OutlinePlane: FC<PlaneProps & Props> = ({ color, ...rest }) => {
     return (
-        <HtmlPlane {...rest}>
+        <HtmlPlane {...rest} zIndex={1}>
             <div className="relative p-6 m-10 text-white text-center rounded-lg">
                 <div className={clsx(
                     "absolute inset-0 border-2 border-transparent rounded-lg animate-pulse",

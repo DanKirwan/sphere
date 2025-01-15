@@ -64,8 +64,8 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                 {firstShot && secondShot &&
                     <input
                         type="range"
-                        min={50}
-                        max={200}
+                        min={5}
+                        max={20}
                         value={cameraDistance}
                         onChange={e => setCameraDistance(+e.target.value)}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
@@ -118,8 +118,8 @@ export const Alignment: FC<Props> = ({ augmentedPossible }) => {
                 {secondShot && <ShotPlane index={3} shot={secondShot} distance={cameraDistance} disableMask imageStyle={{ opacity: 0.5, filter: "sepia(100%) saturate(300%) brightness(70%) hue-rotate(90deg)" }} />}
 
 
-                {!firstShot && !secondShot && <OutlinePlane zIndex={1} distance={cameraDistance} rotation={initialRotation} color={clsx('bg-blue-700')}></OutlinePlane>}
-                {firstShot && !secondShot && <OutlinePlane zIndex={1} distance={cameraDistance} rotation={shiftedRotation} color={clsx('bg-green-700')}></OutlinePlane>}
+                {!firstShot && !secondShot && <OutlinePlane width={10} height={10} distance={cameraDistance} rotation={initialRotation} color={clsx('bg-blue-700')}></OutlinePlane>}
+                {firstShot && !secondShot && <OutlinePlane width={10} height={10} distance={cameraDistance} rotation={shiftedRotation} color={clsx('bg-green-700')}></OutlinePlane>}
 
                 {augmented ?
                     <DeviceOrientationControls /> :

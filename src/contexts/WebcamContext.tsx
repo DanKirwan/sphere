@@ -1,64 +1,133 @@
-import { createContext, FC, MutableRefObject, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
-import Webcam from "react-webcam";
-import { Quaternion } from "three";
-interface IWebcamContext {
-    webcamRef: MutableRefObject<Webcam | null>;
-    capture: () => string | null;
-    rotationRef: MutableRefObject<Quaternion>;
-    dimensions: { width: number, height: number };
+import React, {
+    createContext,
+    FC,
+    ReactNode,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
+import { Quaternion } from 'three';
+
+type WebcamContextValue = {
+    videoRef: React.RefObject<HTMLVideoElement>;
+    capture: () => string;
+    rotationRef: React.MutableRefObject<Quaternion>;
+    dimensions: { width: number; height: number };
 }
 
+// Create the context
+export const WebcamContext = createContext<WebcamContextValue | null>(null);
 
-
-
-export const WebcamContext = createContext({} as IWebcamContext);
-
+// Provide it in your app
 export const WebcamProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const webcamRef = useRef<Webcam | null>(null);
+    // This videoRef points to a plain <video> element (not using react-webcam)
+    const videoRef = useRef<HTMLVideoElement>(null);
     const rotationRef = useRef<Quaternion>(new Quaternion());
-
-
-
-    const capture = useCallback(
-        () => {
-            if (webcamRef.current == null) throw new Error("Cannot screenshot without webcam");
-            const imageSrc = webcamRef.current.getScreenshot();
-            return imageSrc;
-        },
-        [webcamRef]
-    );
-
-
-
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
+    /**
+     * Capture: draws the current video frame to an offscreen canvas and returns Base64
+     */
+    const capture = useCallback(() => {
+        if (!videoRef.current) {
+            throw new Error('Cannot screenshot without an active webcam');
+        }
+        const video = videoRef.current;
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            throw new Error('Could not get canvas context for screenshot');
+        }
+
+        // Draw current video frame onto the canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Return image as base64
+        return canvas.toDataURL('image/png');
+    }, []);
+
+    /**
+     * Request user’s webcam and attach to the <video> element
+     */
     useEffect(() => {
-        const updateDimensions = () => {
-            if (webcamRef.current) {
-                const video = webcamRef.current?.video;
-                if (video) {
-                    setDimensions({
-                        width: video.videoWidth,
-                        height: video.videoHeight,
-                    });
-                }
+        let stream: MediaStream;
+        async function initWebcam() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false,
+                });
+                if (!videoRef.current)
+                    return;
+                if (videoRef.current.srcObject) return;
+
+                videoRef.current.srcObject = stream;
+                await videoRef.current.play();
+            } catch (err) {
+                console.error('Error accessing webcam', err);
+            }
+        }
+        initWebcam();
+
+        // Cleanup: stop webcam if provider unmounts
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach((track) => track.stop());
             }
         };
-
-        // Call it once initially
-        updateDimensions();
-
-        // Optional: Add resize listener if needed
-        window.addEventListener('resize', updateDimensions);
-
-        return () => window.removeEventListener('resize', updateDimensions);
     }, []);
+
+    /**
+     * Update video dimensions once metadata is loaded
+     */
+    useEffect(() => {
+        const handleLoadedMetadata = () => {
+            if (videoRef.current) {
+                setDimensions({
+                    width: videoRef.current.videoWidth,
+                    height: videoRef.current.videoHeight,
+                });
+            }
+        };
+        if (videoRef.current) {
+            videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+        }
+        return () => {
+            if (videoRef.current) {
+                videoRef.current.removeEventListener(
+                    'loadedmetadata',
+                    handleLoadedMetadata
+                );
+            }
+        };
+    }, []);
+
     return (
-        <WebcamContext.Provider value={{ webcamRef, capture, rotationRef, dimensions }}>
+        <WebcamContext.Provider
+            value={{
+                videoRef,
+                capture,
+                rotationRef,
+                dimensions,
+            }}
+        >
+            {/* We keep the actual <video> element hidden somewhere in the DOM */}
+            <video
+                ref={videoRef}
+                style={{ display: 'none' }}
+                playsInline
+                muted
+            />
             {children}
         </WebcamContext.Provider>
     );
-}
+};
+
 
 export const useWebcam = () => {
     const context = useContext(WebcamContext);
